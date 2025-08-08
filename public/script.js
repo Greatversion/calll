@@ -1,6 +1,6 @@
 const socket = io();
-const callBtn = document.getElementById('callBtn');
 const statusText = document.getElementById('status');
+const remoteAudio = document.getElementById('remoteAudio');
 
 let peerConnection;
 let localStream;
@@ -10,7 +10,7 @@ const config = {
   iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
 };
 
-// ✅ Join the signaling server on page load
+// Join the signaling server on page load
 window.addEventListener('DOMContentLoaded', () => {
   socket.emit('join');
 });
@@ -45,12 +45,19 @@ socket.on('leave', () => {
     peerConnection.close();
     peerConnection = null;
   }
+  remoteAudio.srcObject = null;
 });
 
 async function startCall() {
   statusText.textContent = 'Starting voice call...';
 
-  localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  try {
+    localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  } catch (err) {
+    statusText.textContent = 'Error accessing microphone: ' + err.message;
+    console.error('getUserMedia error:', err);
+    return;
+  }
 
   peerConnection = new RTCPeerConnection(config);
 
@@ -60,11 +67,15 @@ async function startCall() {
     }
   };
 
+  peerConnection.onconnectionstatechange = () => {
+    console.log('Connection state:', peerConnection.connectionState);
+  };
+
   peerConnection.ontrack = (event) => {
-    const audio = document.createElement('audio');
-    audio.srcObject = event.streams[0];
-    audio.autoplay = true;
-    document.body.appendChild(audio);
+    console.log('Track received:', event.track.kind);
+    if (remoteAudio.srcObject !== event.streams[0]) {
+      remoteAudio.srcObject = event.streams[0];
+    }
   };
 
   localStream.getTracks().forEach(track => {
