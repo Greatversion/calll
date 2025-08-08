@@ -7,8 +7,16 @@ let localStream;
 let isCaller = false;
 
 const config = {
-  iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+  iceServers: [
+    { urls: 'stun:stun.l.google.com:19302' },
+    {
+      urls: 'turn:your.turn.server:3478',
+      username: 'user',
+      credential: 'pass'
+    }
+  ]
 };
+
 
 // Join the signaling server on page load
 window.addEventListener('DOMContentLoaded', () => {
