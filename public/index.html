@@ -20,23 +20,25 @@
 
     /* Glass container */
     .phone-ui {
-      position: relative;
-      z-index: 1;
-      width: 100;
-      height: 100;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 30px;
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-      padding: 30px 20px;
-      box-sizing: border-box;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 360px;
+  height: 540px;
+  background: rgba(255, 255, 255, 0.362); /* Very light haze */
+  border-radius: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.277);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.862);
+  padding: 30px 20px;
+  box-sizing: border-box;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+}
+
+
 
     .avatar {
       width: 250px;
