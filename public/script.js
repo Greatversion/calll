@@ -71,12 +71,14 @@ async function startCall() {
     console.log('Connection state:', peerConnection.connectionState);
   };
 
-  peerConnection.ontrack = (event) => {
-    console.log('Track received:', event.track.kind);
-    if (remoteAudio.srcObject !== event.streams[0]) {
-      remoteAudio.srcObject = event.streams[0];
-    }
-  };
+ peerConnection.ontrack = (event) => {
+  console.log('Track received:', event.track.kind);
+  const [remoteStream] = event.streams;
+  if (remoteStream && remoteAudio.srcObject !== remoteStream) {
+    remoteAudio.srcObject = remoteStream;
+  }
+};
+
 
   localStream.getTracks().forEach(track => {
     peerConnection.addTrack(track, localStream);
