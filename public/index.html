@@ -3,74 +3,82 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Birthday Wish Call UI</title>
+  <title>Birthday Wish Call</title>
   <style>
-    /* Background */
     body, html {
       margin: 0;
       padding: 0;
       height: 100%;
       overflow: hidden;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%);
+      font-family: 'Segoe UI', sans-serif;
+      background: url('background.jpg') no-repeat center center/cover;
       display: flex;
       justify-content: center;
       align-items: center;
     }
 
-    .background {
-      position: fixed;
-      width: 100%;
-      height: 100%;
-      z-index: 1;
-      pointer-events: none;
-    }
-
-    /* Glassmorphic container */
     .phone-ui {
       position: relative;
       z-index: 10;
-      width: 320px;
-      height: 480px;
-      background: rgba(255, 255, 255, 0.15);
+      width: 340px;
+      height: 520px;
+      background: rgba(255, 255, 255, 0.1);
       border-radius: 25px;
-      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 40px 20px;
+      padding: 30px 20px;
+      box-sizing: border-box;
       text-align: center;
       color: white;
-      box-sizing: border-box;
     }
 
-    /* Avatar image */
     .avatar {
       width: 120px;
       height: 120px;
       border-radius: 50%;
       border: 3px solid white;
-      box-shadow: 0 8px 16px rgba(255, 255, 255, 0.25);
       object-fit: cover;
       margin-bottom: 20px;
       background: white;
     }
 
-    /* Name and status */
     .name {
-      font-size: 2rem;
-      margin: 0 0 10px;
+      font-size: 1.8rem;
       font-weight: bold;
-      text-shadow: 0 0 6px #ffc0cb;
+      margin: 10px 0;
     }
 
     .status {
       font-size: 1.2rem;
-      margin: 0;
+      margin-bottom: 20px;
       text-shadow: 0 0 6px #ff69b4;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: auto;
+    }
+
+    button {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 12px;
+      font-weight: bold;
+      font-size: 1rem;
+      background-color: rgba(255, 255, 255, 0.2);
+      color: white;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+    }
+
+    button:hover {
+      background-color: rgba(255, 255, 255, 0.35);
     }
 
     /* Balloons container */
@@ -82,82 +90,62 @@
       width: 100vw;
       height: 100vh;
       overflow: hidden;
-      z-index: 5;
+      z-index: 1;
     }
 
-    /* Balloon styles */
     .balloon {
       position: absolute;
-      bottom: -100px;
-      width: 40px;
-      height: 60px;
+      width: 30px;
+      height: 50px;
       background: radial-gradient(circle at 30% 30%, #ff6f91, #d72631);
       border-radius: 60% 60% 60% 60% / 80% 80% 20% 20%;
       opacity: 0.8;
-      animation: floatUp linear forwards;
+      animation: floatUp 10s linear infinite;
       filter: drop-shadow(0 0 4px #d72631);
     }
 
-    .balloon:nth-child(2) {
-      background: radial-gradient(circle at 30% 30%, #ffc75f, #f4c242);
-      filter: drop-shadow(0 0 4px #f4c242);
-      width: 30px;
-      height: 45px;
-      animation-duration: 8s;
-      left: 20%;
-    }
-    .balloon:nth-child(3) {
-      background: radial-gradient(circle at 30% 30%, #88d8b0, #57b894);
-      filter: drop-shadow(0 0 4px #57b894);
-      width: 38px;
-      height: 55px;
-      animation-duration: 9s;
-      left: 50%;
-    }
-    .balloon:nth-child(4) {
-      background: radial-gradient(circle at 30% 30%, #a29bfe, #6c5ce7);
-      filter: drop-shadow(0 0 4px #6c5ce7);
-      width: 35px;
-      height: 50px;
-      animation-duration: 10s;
-      left: 75%;
-    }
-
-    /* Balloon blend and float */
     @keyframes floatUp {
       0% {
-        bottom: -100px;
-        opacity: 0.8;
-        transform: translateX(0) rotate(0deg);
+        transform: translateY(100vh) translateX(0) rotate(0deg);
+        opacity: 0.9;
       }
       100% {
-        bottom: 110vh;
+        transform: translateY(-120vh) translateX(50px) rotate(360deg);
         opacity: 0;
-        transform: translateX(50px) rotate(360deg);
       }
     }
   </style>
 </head>
 <body>
-  <div class="background"></div>
-
-  <div class="balloons">
-    <div class="balloon" style="left: 10%; animation-duration: 7s;"></div>
-    <div class="balloon"></div>
-    <div class="balloon"></div>
-    <div class="balloon"></div>
-  </div>
+  <div class="balloons" id="balloons"></div>
 
   <div class="phone-ui">
     <img src="image.png" alt="User" class="avatar" />
     <h2 class="name">Happy Birthday!</h2>
-    <p id="status" class="status">Wishing you joy and happiness</p>
+    <p id="status" class="status">Click start to begin call</p>
+
+    <div class="buttons">
+      <button id="startBtn">Start Call</button>
+      <button id="endBtn" disabled>End Call</button>
+    </div>
   </div>
 
-  <!-- Persistent remote audio element -->
   <audio id="remoteAudio" autoplay playsinline></audio>
 
   <script src="/socket.io/socket.io.js"></script>
   <script src="script.js"></script>
+  <script>
+    // Add many animated balloons
+    const balloonContainer = document.getElementById('balloons');
+    for (let i = 0; i < 30; i++) {
+      const b = document.createElement('div');
+      b.classList.add('balloon');
+      b.style.left = Math.random() * 100 + 'vw';
+      b.style.animationDuration = 6 + Math.random() * 5 + 's';
+      b.style.width = 25 + Math.random() * 20 + 'px';
+      b.style.height = 40 + Math.random() * 20 + 'px';
+      balloonContainer.appendChild(b);
+    }
+  </script>
 </body>
 </html>

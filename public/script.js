@@ -1,22 +1,41 @@
 const socket = io();
 const statusText = document.getElementById('status');
 const remoteAudio = document.getElementById('remoteAudio');
+const startBtn = document.getElementById('startBtn');
+const endBtn = document.getElementById('endBtn');
 
 let peerConnection;
 let localStream;
 let isCaller = false;
+let hasJoined = false;
 
 const config = {
   iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
 };
 
-// Join the signaling server on page load
-window.addEventListener('DOMContentLoaded', () => {
-  socket.emit('join');
-});
+// Button handlers
+startBtn.onclick = () => {
+  if (!hasJoined) {
+    socket.emit('join');
+    hasJoined = true;
+    statusText.textContent = 'Joining...';
+  }
+};
 
+endBtn.onclick = () => {
+  if (peerConnection) {
+    peerConnection.close();
+    peerConnection = null;
+  }
+  remoteAudio.srcObject = null;
+  statusText.textContent = 'Call ended.';
+  startBtn.disabled = false;
+  endBtn.disabled = true;
+};
+
+// Socket.IO handlers
 socket.on('joined', () => {
-  statusText.textContent = 'Waiting for peer to join...';
+  statusText.textContent = 'Waiting for peer...';
 });
 
 socket.on('ready', async () => {
@@ -35,7 +54,11 @@ socket.on('signal', async (data) => {
       socket.emit('signal', { sdp: answer });
     }
   } else if (data.candidate) {
-    await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+    try {
+      await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+    } catch (err) {
+      console.warn('Error adding ICE candidate', err);
+    }
   }
 });
 
@@ -46,16 +69,18 @@ socket.on('leave', () => {
     peerConnection = null;
   }
   remoteAudio.srcObject = null;
+  startBtn.disabled = false;
+  endBtn.disabled = true;
 });
 
+// WebRTC logic
 async function startCall() {
-  statusText.textContent = 'Starting voice call...';
+  statusText.textContent = 'Connecting...';
 
   try {
     localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
   } catch (err) {
-    statusText.textContent = 'Error accessing microphone: ' + err.message;
-    console.error('getUserMedia error:', err);
+    statusText.textContent = 'Microphone error: ' + err.message;
     return;
   }
 
@@ -67,18 +92,13 @@ async function startCall() {
     }
   };
 
-  peerConnection.onconnectionstatechange = () => {
-    console.log('Connection state:', peerConnection.connectionState);
+  peerConnection.ontrack = (event) => {
+    const [remoteStream] = event.streams;
+    if (remoteStream && remoteAudio.srcObject !== remoteStream) {
+      remoteAudio.srcObject = remoteStream;
+      remoteAudio.play().catch(err => console.warn('Autoplay failed:', err));
+    }
   };
-
- peerConnection.ontrack = (event) => {
-  console.log('Track received:', event.track.kind);
-  const [remoteStream] = event.streams;
-  if (remoteStream && remoteAudio.srcObject !== remoteStream) {
-    remoteAudio.srcObject = remoteStream;
-  }
-};
-
 
   localStream.getTracks().forEach(track => {
     peerConnection.addTrack(track, localStream);
@@ -90,5 +110,7 @@ async function startCall() {
     socket.emit('signal', { sdp: offer });
   }
 
-  statusText.textContent = 'Call connected!';
+  statusText.textContent = 'Call in progress...';
+  startBtn.disabled = true;
+  endBtn.disabled = false;
 }
